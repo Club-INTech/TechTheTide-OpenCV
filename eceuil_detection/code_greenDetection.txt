@@ -1,0 +1,6 @@
+iLowH 70
+iHighH 100
+iLowS 160
+iHighS 255
+iLowV 0
+iHighV 255
