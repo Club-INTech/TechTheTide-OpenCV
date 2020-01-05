@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     inputVideo.open(0);
     cv::Matx33d cameraMatrix = Matx33d(.0767696485099054e+02, 0., 6.3074175237948407e+02, 0., 8.0767696485099054e+02,
                                        3.8551547885624814e+02, 0., 0., 1.);
-    cv::Mat distCoeffs = Mat(0., 9.0756263737609579e+00, 2.9472807904506051e+00, 2.6490685322879028e+00);
+    cv::Mat distCoeffs = Mat(0., 9.0756263737609579e+00, 2.9472807904506051e+00, 2.6490685322879028e+00); //Parameters of the camera (OpenCV calibration)
     cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
     while (inputVideo.grab()) {
         cv::Mat image, imageCopy;
@@ -60,17 +60,17 @@ int main(int argc, char** argv) {
         image.copyTo(imageCopy);
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f> > corners;
-        cv::aruco::detectMarkers(image, dictionary, corners, ids);
+        cv::aruco::detectMarkers(image, dictionary, corners, ids); //searching for the 17th tag of the dictionary
         std::vector<cv::Vec3d> rvecs, tvecs;
         if (ids[0] == 17) {
             cv::aruco::estimatePoseSingleMarkers(corners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
             Mat R;
             Rodrigues(rvecs, R);
-            Vec3f EulerMatrix = rotationMatrixToEulerAngles(R);
+            Vec3f EulerMatrix = rotationMatrixToEulerAngles(R); // Searching for the rotation of the aruco tag
             for (int i = 0; i < 3; i++) {
-                EulerMatrix[i] = (EulerMatrix[i] * 180) / M_PI;
+                EulerMatrix[i] = (EulerMatrix[i] * 180) / M_PI; // Conversion in degree
             }
-            if (EulerMatrix[1] < 0) { config[0] = 'N'; }
+            if (EulerMatrix[1] < 0) { config[0] = 'N'; } // EulerMatrix[1] = y coordinate
             else { config[0] = 'S'; }
         }
         if (config[0] != '0') {
@@ -78,6 +78,6 @@ int main(int argc, char** argv) {
             break;
         }
     }
-    cout << config[0] << endl;
+   // cout << config[0] << endl;
     return config[0];
 }
