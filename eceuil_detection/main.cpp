@@ -8,7 +8,7 @@
 
 /* @author yam
  * creation : 12/05/2019
- * last modification : 12/13/2019*/
+ * last modification : 13/12/2019 */
 
 using namespace cv;
 using namespace std;
@@ -72,6 +72,8 @@ int main( int argc, char** argv ) {
 
         cv::Rect roi(imgOriginal1.cols / 4, imgOriginal1.rows / 4, imgOriginal1.cols / 2, imgOriginal1.rows / 2);
         cv::Mat imgOriginal = imgOriginal1(roi); /* End of what Willy has done  */
+
+        // Pb correction méca caméra? ROI qui change de l'autre côté ?
 
         Mat imgHSV;
 

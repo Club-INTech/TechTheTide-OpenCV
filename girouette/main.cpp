@@ -1,6 +1,6 @@
 #include <opencv2/core.hpp>
 #include <vector>
-#include "opencv2/dictionary.hpp"
+#include "opencv2/aruco/dictionary.hpp"
 #include "opencv2/aruco.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "iostream"
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
     array<char, 1> config = {{'O'}};
     cv::VideoCapture inputVideo;
-    inputVideo.open(0);
+    inputVideo.open(1);
     cv::Matx33d cameraMatrix = Matx33d(.0767696485099054e+02, 0., 6.3074175237948407e+02, 0., 8.0767696485099054e+02,
                                        3.8551547885624814e+02, 0., 0., 1.);
     cv::Mat distCoeffs = Mat(0., 9.0756263737609579e+00, 2.9472807904506051e+00, 2.6490685322879028e+00); //Parameters of the camera (OpenCV calibration)
@@ -78,6 +78,6 @@ int main(int argc, char** argv) {
             break;
         }
     }
-   // cout << config[0] << endl;
+    cout << config[0] << endl;
     return config[0];
 }
