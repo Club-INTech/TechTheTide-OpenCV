@@ -45,7 +45,7 @@ Vec3f rotationMatrixToEulerAngles(Mat &R)
 
 }
 
-int main(int argc, char** argv) {
+int tagAruco() {
 
     array<char, 1> config = {{'O'}};
     cv::VideoCapture inputVideo;
@@ -80,4 +80,8 @@ int main(int argc, char** argv) {
     }
     cout << config[0] << endl;
     return config[0];
+}
+
+int main(int args, char** argv) {
+    return tagAruco();
 }
