@@ -8,7 +8,7 @@
 #include "cmath"
 
 //
-// Created by yasmine on 28/01/2020.
+// Created by AznekEnimsay (yasmine) on 28/01/2020.
 //
 
 #ifndef OPENCV_TTTIDE_GIROUETTE_H
