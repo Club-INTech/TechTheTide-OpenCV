@@ -174,15 +174,58 @@ Maintenant toutes les fonctions utilisées dans le projet TechTheTide sont prés
 
  ## Aruco
  
- ### Et encore des bibliothèques....
+En plus de certaines des bibliothèques présentées précédemment, la détection de tag aruco requière l'utilisation de deux autres bibliothèques : 
  
- En plus de certaines des bibliothèques présentées précédemment, la détection de tag aruco requière l'utilisation de deux autres bibliothèques : 
- > aruco
+ ### dictionnary
+ 
+C'est la bibliothèque regroupant tous les dictionnaires aruco. Un dictionnaire aruco regroupe soit 50, 100 ou 250 tags aruco. Les tags sont différenciés par leur taille (4X4 ou 8X8 ou que sait-je...) et donc une bibliothèque regroupe un ensemble de tags ayant la même taille.
+Dans un dictionnaire précis, chaque tag à un identifiant précis. Il est donc important de préciser dans quel dictionnaire on travail afin d'avoir l'id d'un tag et pouvoir l'appeler dans un programme.
+On appel un dictionnaire avec la fonction `getPredefinedDictionary`.
+
+###  aruco
 
 Cette bibliothèque regroupe toutes les fonctions utiles pour travailler avec des tags aruco : détection du tag, orientation du tag dans l'espace...
+Allez go faire un tour des fonctions qu'on trouve dedans !!
 
-> dictionnary
+> detectMarkers
 
-C'est la bibliothèque regroupant tous les dictionnaires aruco. Un dictionnaire aruco regroupe soit 50, 100 ou 250 tags aruco. Les tags sont différenciés par leur taille (4X4 ou 8X8 ou que sait-je...) et donc une bibliothèque regroupe un ensemble de tags ayant la même taille.
-Dans un dictionnaire précis, chaque tag à un identifiant précis. Il est donc important de préciser dans quel dictionnaire l'on travail afin d'avoir l'id d'un tag et pouvoir l'appeler dans un programme.
- ## Envoie des données : petit point rapide
+La fonction `detectMarkers(image, dictionary, corners, id)` permet de détecter tous les markers de l'image 'image', appartenant au dico 'dictionnary'. Avec cette fonction, on possède les positions des coins du tag détecté mais aussi l'identifiant 'id' du tag détecté.
+
+> estimatePoseSingleMarkers
+
+Cette fonction renvoie la position (en terme de rotation suivant les 3 axes de notre monde) dans l'espace d'un tag aruco donné. On implémente la fonction comme suit : `estimatePoseSingleMarkers(corners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs)`. Les différents arguments sont :
+
+- corners : C'est le vecteur contenant les points de chaque côté du tag afin de le repérer dans l'espace. C'est ainsi que la fonction sait où chercher et avec quel tag travailler.
+- markerLength : C'est la taille d'un côté du marqueur, donnée en mètre.
+- cameraMatrix et distCoeffs : il s'agit des paramètre de la caméra obtenue après configuration.
+- rvecs / tvecs : C'est un vecteur (une matrice colonne) donnant les coefficients de rotation / translation du tag dans l'espace
+
+> Rodrigues
+
+Converti une matrice de rotation en un vecteur de rotation ou vice versa. La différence ? Une matrice de rotation c'est la matrice 3x3 que l'on a vu en prépa et qui traduit la rotation de notre espace par rapport à un espace de réference. Un vecteur de rotation, c'est une manière plus compacte de représenter une matrice de rotation (matrice colonne de R3)
+La fonction Rodrigues est très puissante car c'est avec elle que l'on détermine la rotation d'un tag dans l'espace et dans le cas d'une girouette, c'est avec cette fonction que l'on sait dans quelle directio aller !
+Cependant la matrice de rotation tel quel est inexploitable : ce que l'on veut c'est calculer l'angle entre un vecteur de la fixe dans l'espace de référence et un vecteur de la base "tournante". Pour ce faire, la fonction `rotationMatrixToEulerAngles` existe et fait le job. Une fois tous les coefficients convertis en degrès, trouver la bonne direction est un jeu d'enfant !
+
+ 
+ 
+ET VOILAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA !!!!!!!!!!!!!!!!!!!!
+Finalement le traitement d'images c'est pas trop compliqué et c'est assez marrant il faut l'avouer !! Mais maintenant que l'on a tout traité, que tout marche et qu'on est content, il va falloir tout envoyer au robot... E tlà comment on fait ? Et bien maintenant place à un petit cours sur comment ça marche le réseau et pourquoi la Minet elle est cassée?
+
+## Envoie des données : petit point rapide
+
+En fait on va pas refaire tout un cours de réseau, si ça vous intéresse vraiment, allez à Minet ils vous expliquerons vous verrez ils ne mordent pas et ils sont aussi cons qu'à INTech. Par contre, on va s'attarder un instant sur comment marche le protocole TCP/IP afin d'avoir les bases et de tout envoyer dans l'ordre sans tout casser parce que votre Robot n'a pas demandé le droit de se connecter oupsi y a plus la wifi tkt je te vois venir !
+Bref commençons par les bases : fonctionnement du prtocole TCP/IP. C'est un protocole permettant d'établir la connexion entre un serveur (le nuc ou tout simplement l'ordi qu'il y a sur votre balise) et un client, ici un petit robot tout con et tout mignon. 
+En suivant ce protocole, vous pourrez envoyer et recevoir de l'information mais comme tout protocole, il y a certaines règles à respecter, notamment des règles de priorités.
+- Tout d'abord, lorsque le client veut soutirer des infos du serveur ou bien envoyer des trucs au serveur, il fait une demande de connexion. C'est toujours le client qui fait le premier pas, le serveur lui reste à l'affût d'une éventuelle connexion.
+- Une fois la connexion lancée, le serveur et le client crée un 'lien', un canal de communication que l'on appel socket. Dans une socket circule des paquets qu'il faut voir comme des lettres ou des colis. À l'intérieur il y a le string que vous voulez envoyer/recevoir. Tous les paquets sont sous formes de string. Puis, comme sur tous les colis envoyés par la poste finalement, il y a dessus l'adresse du destinatire et l'adresse source, de celui qui envoit le paquet. Quelle adresse ? Et bien l'adresse IP comme l'indique le nom de ce protocole, c'est avec elle que l'on travail. Donc pour envoyer un message il vous faut l'adresse IP de votre destinataire, que vous soyez client ou serveur (d'ailleur dans l'étape de première approche aussi il vous faut l'adresse IP du serveur).
+- Quand on envoie un paquet (avec `send`) il faut savoir que celui qui intercepte vos paquets n'est pas toujours réceptif : tant que la commande `read` n'est pas appelée, celui qui reçoit les paquets les regardes arriver tout en ayant un comportement totalement passif... Donc n'oubliez pas de déballer vos paquets !!
+- Une fois les premiers paquets envoyés de la part du client ou du serveur, il est temps de mettre un terme à cette belle discussion : il ne faut pas oublier de se déconnecter !! 
+
+* **Shéma** :
+
+![CommunicationToHL.communicationToHL](ConnectionToHL/connexion.jpeg)
+
+Si vous voulez approfondir tout ça : https://openclassrooms.com/fr/courses/857447-apprenez-le-fonctionnement-des-reseaux-tcp-ip ou bien allez à Minet ils vous expliquerons ;)
+
+
+Sur ceux bonne continuation et bon retour / bonne rentrée dans le HL !!
